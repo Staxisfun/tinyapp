@@ -49,10 +49,16 @@ app.post("/urls", (req, res) => {
   // console.log(req.body); 
   const id = generateRandomString()
   let value = req.body["longURL"]
-  // console.log("value: ", value)
+   console.log("value: ", value)
   urlDatabase[id] = value
   console.log(urlDatabase)
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${id}`);
+});
+
+app.get("/u/:id", (req, res) => {
+  const longURL = 
+  console.log(longURL)
+  res.redirect(longURL);
 });
 
 
