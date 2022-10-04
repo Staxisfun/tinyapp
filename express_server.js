@@ -44,7 +44,14 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
+  // add the id/long url (key-value pair) to the urlDatabase object
+  // respond with a redirect to a new url
+  // console.log(req.body); 
+  const id = generateRandomString()
+  let value = req.body["longURL"]
+  // console.log("value: ", value)
+  urlDatabase[id] = value
+  console.log(urlDatabase)
   res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
