@@ -62,7 +62,7 @@ const id = generateRandomString()
 });
 
 
-
+//code for redirecting to a url from it's shortend form
 app.get("/u/:id", (req, res) => {
   
 const id = req.params.id
@@ -70,7 +70,7 @@ const id = req.params.id
   res.redirect(longURL);
 });
 
-
+//Code for deleting a saved url
 app.post('/urls/:id/delete', (req, res) => {
 const id = req.params.id
 
