@@ -20,22 +20,31 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+
+
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
+
+
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
+
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
+
 
 
 app.get("/urls/:id", (req, res) => {
@@ -43,17 +52,16 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+
+
 app.post("/urls", (req, res) => {
-  // add the id/long url (key-value pair) to the urlDatabase object
-  // respond with a redirect to a new url
-  // console.log(req.body); 
-  const id = generateRandomString()
+const id = generateRandomString()
   let value = req.body["longURL"]
-   console.log("value: ", value)
   urlDatabase[id] = value
-  console.log(urlDatabase)
   res.redirect(`/urls/${id}`);
 });
+
+
 
 app.get("/u/:id", (req, res) => {
   
@@ -61,6 +69,17 @@ const id = req.params.id
  const longURL = urlDatabase[id]
   res.redirect(longURL);
 });
+
+
+app.post('/urls/:id/delete', (req, res) => {
+const id = req.params.id
+
+delete urlDatabase[id]
+
+res.redirect("/urls")
+});
+
+
 
 
 app.listen(PORT, () => {
