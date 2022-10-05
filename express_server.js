@@ -73,6 +73,13 @@ const id = req.params.id
   res.redirect(longURL);
 });
 
+
+app.get("/register", (req, res) => {
+const templateVars = {username: req.cookies['username']}
+res.render("urls_registration", templateVars)
+});
+
+
 //Code for deleting a saved url
 app.post('/urls/:id/delete', (req, res) => {
 const id = req.params.id
