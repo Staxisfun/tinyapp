@@ -134,6 +134,12 @@ app.get("/register", (req, res) => {
 });
 
 
+app.get("/login", (req, res) => {
+
+  res.render("urls_login", {user:null})
+})
+
+
 //Code for deleting a saved url
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
