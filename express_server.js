@@ -30,6 +30,19 @@ const users = {
   
 };
 
+
+const findUserByUserID = (ID) => {
+  for (const user in users) {
+    if (user.id === ID) {
+      return user
+    }
+  }
+};
+
+
+
+
+
 function generateRandomString() {
 
   let random = (Math.random().toString(36).slice(6, 12));
@@ -68,21 +81,27 @@ app.get("/hello", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies['username'] };
+  const id = req.cookies.user_id
+  const user = users[id]
+  const templateVars = { urls: urlDatabase, user };
   res.render("urls_index", templateVars);
 });
 
 
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: req.cookies['username'] };
+  const id = req.cookies.user_id
+  const user = users[id]
+  const templateVars = { user };
   res.render("urls_new", templateVars);
 });
 
 
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies['username'] };
+  const id = req.cookies.user_id
+  const user = users[id]
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], user };
   res.render("urls_show", templateVars);
 });
 
@@ -106,8 +125,8 @@ app.get("/u/:id", (req, res) => {
 
 
 app.get("/register", (req, res) => {
-  const templateVars = { username: req.cookies['username'] };
-  res.render("urls_registration", templateVars);
+  
+  res.render("urls_register", {user:null});
 });
 
 
@@ -142,7 +161,7 @@ app.post("/login", (req, res) => {
 
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
 });
 
@@ -160,7 +179,7 @@ password
 
 users[id] = user;
 console.log(users)
-res.cookie('user_Id', user.id)
+res.cookie('user_id', user.id)
 res.redirect("/urls")
 
 });
