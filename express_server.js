@@ -80,6 +80,16 @@ res.redirect("/urls")
 });
 
 
+app.post("/urls/:id", (req, res) => {
+const id = req.params.id
+const longURL = req.body.longURL
+console.log("id: ", id)
+console.log("longURL: ", longURL)
+urlDatabase[id] = longURL
+
+res.redirect("/urls")
+});
+
 
 
 app.listen(PORT, () => {
