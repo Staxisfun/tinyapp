@@ -31,14 +31,18 @@ const users = {
 };
 
 
-const findUserByUserID = (ID) => {
-  for (const user in users) {
-    if (user.id === ID) {
-      return user
+const getUserByEmail = (email) => {
+  for (const id in users) {
+    const user = users[id];
+
+    if (user.email === email) {
+      // we found our user!!
+      return user;
     }
   }
+//maybe this should be undefined for future tests???
+  return null;
 };
-
 
 
 
@@ -167,9 +171,21 @@ app.post("/logout", (req, res) => {
 
 //code to register a new user in the users database
 app.post("/register", (req, res) => {
-const id = generateUniqueId()
-const email = req.body['email']
-const password = req.body['password']
+  const email = req.body.email
+  const password = req.body.password
+  
+  //checks if a email and password are being entered
+  if (!email || !password) {
+    return res.status(400).send('please enter a username and a password')
+  }
+  //checks if the email is already being used
+  const dbUser = getUserByEmail(email);
+  
+  if (dbUser) {
+    return res.status(400).send('email is already in use')
+  }
+  //creates a new user object
+  const id = generateUniqueId()
 
 const user = {
 id,
@@ -177,6 +193,7 @@ email,
 password
 };
 
+//updates the user database with the new user
 users[id] = user;
 console.log(users)
 res.cookie('user_id', user.id)
