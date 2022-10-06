@@ -98,19 +98,19 @@ if (!user) {
  return res.send('You must either register or login to view URLs')
 }
 
-function urlsForUser(id) {
+  const urlsForUser = (id) => {
   const result = {}
   for (const shortUrl in urlDatabase) {
     if (id === urlDatabase[shortUrl].userID) {
-      result[shortUrl] = urlDatabase[shortUrl].longURL
+      result[shortUrl] = urlDatabase[shortUrl]
       
     }
   }
   return result
 }
+  
 
-
-  const templateVars = { urls: urlDatabase, user };
+  const templateVars = { urls: urlsForUser(id), user };
   res.render("urls_index", templateVars);
 });
 
