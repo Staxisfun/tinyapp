@@ -133,8 +133,11 @@ app.post("/urls", (req, res) => {
 
 //code for redirecting to a url from it's shortend form
 app.get("/u/:id", (req, res) => {
-
   const id = req.params.id;
+  if (!urlDatabase[id]) {
+   return res.send('id does not exist')
+  }
+
   const longURL = urlDatabase[id];
   res.redirect(longURL);
 });
