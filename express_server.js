@@ -161,11 +161,20 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+  const email = req.body.email
+  const password = req.body.password
+  
+const dbUser = getUserByEmail(email);
+// User not found error check
+if (!dbUser) {
+  return res.status(403).send('user not found')
+}
+//incorrect password error check
+if (dbUser && dbUser.password !== password) {
+  return res.status(403).send('Incorrect password')
+}
 
-  const username = req.body.username;
-
-  console.log(username);
-  res.cookie('username', username);
+  res.cookie('user_id', dbUser.id);
   res.redirect("/urls");
 });
 
@@ -182,7 +191,7 @@ app.post("/register", (req, res) => {
   
   //checks if a email and password are being entered
   if (!email || !password) {
-    return res.status(400).send('please enter a username and a password')
+    return res.status(400).send('please enter an email and a password')
   }
   //checks if the email is already being used
   const dbUser = getUserByEmail(email);
@@ -201,7 +210,6 @@ password
 
 //updates the user database with the new user
 users[id] = user;
-console.log(users)
 res.cookie('user_id', user.id)
 res.redirect("/urls")
 
