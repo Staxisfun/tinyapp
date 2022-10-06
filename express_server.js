@@ -96,6 +96,12 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const id = req.cookies.user_id
   const user = users[id]
+//Checks whether user is logged in before they are allowed to create a new URL
+  if (!user) {
+    return res.redirect("/login")
+   }
+
+
   const templateVars = { user };
   res.render("urls_new", templateVars);
 });
@@ -112,7 +118,13 @@ app.get("/urls/:id", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
-  const id = generateRandomString();
+  const user = (req.cookies.user_id)
+  
+  if (!user) {
+    return res.send('You must be logged in to shorten URLs')
+   }
+  
+   const id = generateRandomString();
   let value = req.body["longURL"];
   urlDatabase[id] = value;
   res.redirect(`/urls/${id}`);
