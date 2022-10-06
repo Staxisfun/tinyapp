@@ -10,24 +10,30 @@ const PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  'b2xVn2': {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "aj48lw",
+  },
+  '9sm5xK': {
+    longURL: "http://www.google.com",
+    userID: "aj48lw",
+  },
 };
 
 const users = {
-  
+
   'abcd': {
     id: 'abcd',
     email: 'jim@mail.com',
     password: '1234'
   },
-  
+
   'efgh': {
     id: 'efgh',
     email: 'susan@mail.com',
     password: '5678'
   }
-  
+
 };
 
 
@@ -40,7 +46,7 @@ const getUserByEmail = (email) => {
       return user;
     }
   }
-//maybe this should be undefined for future tests???
+  //maybe this should be undefined for future tests???
   return null;
 };
 
@@ -85,8 +91,8 @@ app.get("/hello", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-  const id = req.cookies.user_id
-  const user = users[id]
+  const id = req.cookies.user_id;
+  const user = users[id];
   const templateVars = { urls: urlDatabase, user };
   res.render("urls_index", templateVars);
 });
@@ -94,12 +100,12 @@ app.get("/urls", (req, res) => {
 
 
 app.get("/urls/new", (req, res) => {
-  const id = req.cookies.user_id
-  const user = users[id]
-//Checks whether user is logged in before they are allowed to create a new URL
+  const id = req.cookies.user_id;
+  const user = users[id];
+  //Checks whether user is logged in before they are allowed to create a new URL
   if (!user) {
-    return res.redirect("/login")
-   }
+    return res.redirect("/login");
+  }
 
 
   const templateVars = { user };
@@ -109,22 +115,22 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:id", (req, res) => {
-  const id = req.cookies.user_id
-  const user = users[id]
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], user };
+  const id = req.cookies.user_id;
+  const user = users[id];
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user };
   res.render("urls_show", templateVars);
 });
 
 
 
 app.post("/urls", (req, res) => {
-  const user = (req.cookies.user_id)
-  
+  const user = (req.cookies.user_id);
+
   if (!user) {
-    return res.send('You must be logged in to shorten URLs')
-   }
-  
-   const id = generateRandomString();
+    return res.send('You must be logged in to shorten URLs');
+  }
+
+  const id = generateRandomString();
   let value = req.body["longURL"];
   urlDatabase[id] = value;
   res.redirect(`/urls/${id}`);
@@ -135,31 +141,31 @@ app.post("/urls", (req, res) => {
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
   if (!urlDatabase[id]) {
-   return res.send('id does not exist')
+    return res.send('id does not exist');
   }
 
-  const longURL = urlDatabase[id];
+  const longURL = urlDatabase[id].longURL;
   res.redirect(longURL);
 });
 
 
 app.get("/register", (req, res) => {
-  const user = (req.cookies.user_id)
+  const user = (req.cookies.user_id);
   if (user) {
-   return res.redirect("/urls")
+    return res.redirect("/urls");
   }
-   res.render("urls_register", {user:null});
+  res.render("urls_register", { user: null });
 });
 
 
 app.get("/login", (req, res) => {
- const user = (req.cookies.user_id)
- if (user) {
-  return res.redirect("/urls")
- }
+  const user = (req.cookies.user_id);
+  if (user) {
+    return res.redirect("/urls");
+  }
 
- res.render("urls_login", {user:null})
-})
+  res.render("urls_login", { user: null });
+});
 
 
 //Code for deleting a saved url
@@ -175,24 +181,27 @@ app.post('/urls/:id/delete', (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = req.body.longURL;
-  urlDatabase[id] = longURL;
+  urlDatabase[id] = {
+    longURL: longURL,
+    userID: req.cookies.user_id,
+  },
 
   res.redirect("/urls");
 });
 
 app.post("/login", (req, res) => {
-  const email = req.body.email
-  const password = req.body.password
-  
-const dbUser = getUserByEmail(email);
-// User not found error check
-if (!dbUser) {
-  return res.status(403).send('user not found')
-}
-//incorrect password error check
-if (dbUser && dbUser.password !== password) {
-  return res.status(403).send('Incorrect password')
-}
+  const email = req.body.email;
+  const password = req.body.password;
+
+  const dbUser = getUserByEmail(email);
+  // User not found error check
+  if (!dbUser) {
+    return res.status(403).send('user not found');
+  }
+  //incorrect password error check
+  if (dbUser && dbUser.password !== password) {
+    return res.status(403).send('Incorrect password');
+  }
 
   res.cookie('user_id', dbUser.id);
   res.redirect("/urls");
@@ -206,32 +215,32 @@ app.post("/logout", (req, res) => {
 
 //code to register a new user in the users database
 app.post("/register", (req, res) => {
-  const email = req.body.email
-  const password = req.body.password
-  
+  const email = req.body.email;
+  const password = req.body.password;
+
   //checks if a email and password are being entered
   if (!email || !password) {
-    return res.status(400).send('please enter an email and a password')
+    return res.status(400).send('please enter an email and a password');
   }
   //checks if the email is already being used
   const dbUser = getUserByEmail(email);
-  
+
   if (dbUser) {
-    return res.status(400).send('email is already in use')
+    return res.status(400).send('email is already in use');
   }
   //creates a new user object
-  const id = generateUniqueId()
+  const id = generateUniqueId();
 
-const user = {
-id,
-email,
-password
-};
+  const user = {
+    id,
+    email,
+    password
+  };
 
-//updates the user database with the new user
-users[id] = user;
-res.cookie('user_id', user.id)
-res.redirect("/urls")
+  //updates the user database with the new user
+  users[id] = user;
+  res.cookie('user_id', user.id);
+  res.redirect("/urls");
 
 });
 
