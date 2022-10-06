@@ -117,6 +117,11 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const id = req.cookies.user_id;
   const user = users[id];
+  console.log(urlDatabase)
+  console.log(req.params)
+  console.log(urlDatabase[req.params])
+  console.log(urlDatabase[req.params.id])
+  console.log(urlDatabase[req.params.id].longURL)
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user };
   res.render("urls_show", templateVars);
 });
@@ -132,7 +137,10 @@ app.post("/urls", (req, res) => {
 
   const id = generateRandomString();
   let value = req.body["longURL"];
-  urlDatabase[id] = value;
+  urlDatabase[id] = {
+    longURL: value,
+    userID: user,
+  }
   res.redirect(`/urls/${id}`);
 });
 
