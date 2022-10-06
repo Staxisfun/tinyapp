@@ -93,6 +93,23 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   const id = req.cookies.user_id;
   const user = users[id];
+
+if (!user) {
+ return res.send('You must either register or login to view URLs')
+}
+
+function urlsForUser(id) {
+  const result = {}
+  for (const shortUrl in urlDatabase) {
+    if (id === urlDatabase[shortUrl].userID) {
+      result[shortUrl] = urlDatabase[shortUrl].longURL
+      
+    }
+  }
+  return result
+}
+
+
   const templateVars = { urls: urlDatabase, user };
   res.render("urls_index", templateVars);
 });
