@@ -129,14 +129,21 @@ app.get("/u/:id", (req, res) => {
 
 
 app.get("/register", (req, res) => {
-  
-  res.render("urls_register", {user:null});
+  const user = (req.cookies.user_id)
+  if (user) {
+   return res.redirect("/urls")
+  }
+   res.render("urls_register", {user:null});
 });
 
 
 app.get("/login", (req, res) => {
+ const user = (req.cookies.user_id)
+ if (user) {
+  return res.redirect("/urls")
+ }
 
-  res.render("urls_login", {user:null})
+ res.render("urls_login", {user:null})
 })
 
 
@@ -153,8 +160,6 @@ app.post('/urls/:id/delete', (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = req.body.longURL;
-  console.log("id: ", id);
-  console.log("longURL: ", longURL);
   urlDatabase[id] = longURL;
 
   res.redirect("/urls");
