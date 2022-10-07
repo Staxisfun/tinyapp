@@ -78,9 +78,19 @@ app.get("/", (req, res) => {
 
 
 
+
+
+
+
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
+
+
+
+
 
 
 
@@ -90,29 +100,43 @@ app.get("/hello", (req, res) => {
 
 
 
+
+
+
+
+
+
 app.get("/urls", (req, res) => {
   const id = req.cookies.user_id;
   const user = users[id];
 
-if (!user) {
- return res.send('You must either register or login to view URLs')
-}
+  if (!user) {
+    res.send("<html><body>Error please <a href=/login>log in</a> or <a href=/register>register</a> to view URLs.</body></html>");
+    return;
+  }
 
   const urlsForUser = (id) => {
-  const result = {}
-  for (const shortUrl in urlDatabase) {
-    if (id === urlDatabase[shortUrl].userID) {
-      result[shortUrl] = urlDatabase[shortUrl]
-      
+    const result = {};
+    for (const shortUrl in urlDatabase) {
+      if (id === urlDatabase[shortUrl].userID) {
+        result[shortUrl] = urlDatabase[shortUrl];
+
+      }
     }
-  }
-  return result
-}
-  
+    return result;
+  };
+
 
   const templateVars = { urls: urlsForUser(id), user };
   res.render("urls_index", templateVars);
 });
+
+
+
+
+
+
+
 
 
 
@@ -131,12 +155,46 @@ app.get("/urls/new", (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
 app.get("/urls/:id", (req, res) => {
   const id = req.cookies.user_id;
   const user = users[id];
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user };
-  res.render("urls_show", templateVars);
+
+  if (!user) {
+    res.send("<html><body>Error please <a href=/login>log in</a> or <a href=/register>register</a> to view URLs.</body></html>");
+    return;
+  }
+
+  const databaseObject = urlDatabase[req.params.id];
+
+  if (databaseObject) {
+    if (databaseObject['userID'] !== id) {
+      return res.send("This url does not belong to you");
+    }
+    const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user };
+    return res.render("urls_show", templateVars);
+
+  }
+  return res.send('URL id does not exist');
+
 });
+
+
+
+
+
+
+
+
+
 
 
 
@@ -152,9 +210,18 @@ app.post("/urls", (req, res) => {
   urlDatabase[id] = {
     longURL: value,
     userID: user,
-  }
+  };
   res.redirect(`/urls/${id}`);
 });
+
+
+
+
+
+
+
+
+
 
 
 //code for redirecting to a url from it's shortend form
@@ -167,6 +234,17 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[id].longURL;
   res.redirect(longURL);
 });
+
+
+
+
+
+
+
+
+
+
+
 
 
 app.get("/register", (req, res) => {
@@ -188,26 +266,88 @@ app.get("/login", (req, res) => {
 });
 
 
+
+
+
+
+
+
+
+
+
+
 //Code for deleting a saved url
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
+  const userId = req.cookies.user_id;
+  const user = users[userId];
 
-  delete urlDatabase[id];
+  //checks if user is logged in
+  if (!user) {
+    return res.send("<html><body>Error please <a href=/login>log in</a> or <a href=/register>register</a> to delete URLs.</body></html>");
 
-  res.redirect("/urls");
+  }
+  //checks if the id exists
+  const databaseObject = urlDatabase[req.params.id];
+  if (databaseObject) {
+    //checks if user owns the url they're trying to delete
+    if (databaseObject['userID'] !== userId) {
+      return res.send("this url does not belong to you");
+    }
+    delete urlDatabase[id];
+
+     res.redirect("/urls");
+     return
+  }
+  return res.send('URL id does not exist');
 });
+
+
+
+
+
+
+
+
+
+
 
 
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = req.body.longURL;
-  urlDatabase[id] = {
-    longURL: longURL,
-    userID: req.cookies.user_id,
-  },
+  const userId = req.cookies.user_id;
+  const user = users[userId];
 
-  res.redirect("/urls");
+  //checks if user is logged in
+  if (!user) {
+    return res.send("<html><body>Error please <a href=/login>log in</a> or <a href=/register>register</a> to edit URLs.</body></html>");
+
+  }
+  //checks if the id exists
+  const databaseObject = urlDatabase[req.params.id];
+  if (databaseObject) {
+    //checks if user owns the url they're trying to edit
+    if (databaseObject['userID'] !== userId) {
+      return res.send("this url does not belong to you");
+    }
+    urlDatabase[id] = {
+      longURL: longURL,
+      userID: req.cookies.user_id,
+    },
+   res.redirect("/urls");
+   return
+  }
+  return res.send('URL id does not exist');
+
 });
+
+
+
+
+
+
+
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
@@ -228,10 +368,29 @@ app.post("/login", (req, res) => {
 });
 
 
+
+
+
+
+
+
+
+
+
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
   res.redirect("/urls");
 });
+
+
+
+
+
+
+
+
+
+
 
 //code to register a new user in the users database
 app.post("/register", (req, res) => {
@@ -263,6 +422,11 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 
 });
+
+
+
+
+
 
 
 app.listen(PORT, () => {
