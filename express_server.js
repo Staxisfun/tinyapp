@@ -362,10 +362,6 @@ app.post("/login", (req, res) => {
     return res.status(403).send('user not found');
   }
  
- 
- 
- 
- 
  const result = bcrypt.compareSync(password, dbUser.password);
  
  if (!result) {
@@ -373,13 +369,6 @@ app.post("/login", (req, res) => {
  return res.status(400).send('wrong password')  
 }
    
- 
- 
-  // //incorrect password error check
-  // if (dbUser && dbUser.password !== password) {
-  //   return res.status(403).send('Incorrect password');
-  // }
-console.log(users)
   res.cookie('user_id', dbUser.id);
   res.redirect("/urls");
 });
@@ -424,9 +413,9 @@ app.post("/register", (req, res) => {
   if (dbUser) {
     return res.status(400).send('email is already in use');
   }
+  
   //creates a new user object
   const id = generateUniqueId();
-
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(password, salt);
 
