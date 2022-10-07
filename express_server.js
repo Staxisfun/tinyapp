@@ -3,7 +3,6 @@
 
 const express = require("express");
 const morgan = require("morgan");
-// const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session')
 const bcrypt = require('bcryptjs')
 
@@ -49,7 +48,7 @@ const getUserByEmail = (email) => {
       return user;
     }
   }
-  //maybe this should be undefined for future tests???
+ 
   return null;
 };
 
@@ -74,7 +73,7 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// app.use(cookieParser());
+
 app.use(cookieSession({
 name : 'session',
 keys: ['dfsdf3dsfsd34']
@@ -122,7 +121,6 @@ app.get("/hello", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-  // const id = req.cookies.user_id;
   const id = req.session.user_id;
   const user = users[id];
 
@@ -157,7 +155,6 @@ app.get("/urls", (req, res) => {
 
 
 app.get("/urls/new", (req, res) => {
-  // const id = req.cookies.user_id;
   const id = req.session.user_id;
   const user = users[id];
   //Checks whether user is logged in before they are allowed to create a new URL
@@ -182,7 +179,6 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:id", (req, res) => {
-  // const id = req.cookies.user_id;
   const id = req.session.user_id;
   const user = users[id];
 
@@ -217,7 +213,6 @@ app.get("/urls/:id", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
-  // const user = (req.cookies.user_id);
   const user = (req.session.user_id);
 
   if (!user) {
@@ -267,7 +262,6 @@ app.get("/u/:id", (req, res) => {
 
 
 app.get("/register", (req, res) => {
-  // const user = (req.cookies.user_id);
   const user = (req.session.user_id);
   if (user) {
     return res.redirect("/urls");
@@ -277,7 +271,6 @@ app.get("/register", (req, res) => {
 
 
 app.get("/login", (req, res) => {
-  // const user = (req.cookies.user_id);
   const user = (req.session.user_id);
   if (user) {
     return res.redirect("/urls");
@@ -300,7 +293,6 @@ app.get("/login", (req, res) => {
 //Code for deleting a saved url
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
-  //const userId = req.cookies.user_id;
   const userId = req.session.user_id;
   const user = users[userId];
 
@@ -338,7 +330,6 @@ app.post('/urls/:id/delete', (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = req.body.longURL;
-  // const userId = req.cookies.user_id;
   const userId = req.session.user_id;
   const user = users[userId];
 
@@ -357,7 +348,6 @@ app.post("/urls/:id", (req, res) => {
     urlDatabase[id] = {
       longURL: longURL,
       userID: req.session.user_id,
-      // userID: req.cookies.user_id,
     },
    res.redirect("/urls");
    return
@@ -390,7 +380,6 @@ app.post("/login", (req, res) => {
  return res.status(400).send('wrong password')  
 }
    
-  // res.cookie('user_id', dbUser.id);
   req.session.user_id = dbUser.id
   res.redirect("/urls");
 });
@@ -406,7 +395,6 @@ app.post("/login", (req, res) => {
 
 
 app.post("/logout", (req, res) => {
-  // res.clearCookie('user_id');
   req.session = null;
   res.redirect("/urls");
 });
@@ -451,7 +439,6 @@ app.post("/register", (req, res) => {
 
   //updates the user database with the new user
   users[id] = user;
-  // res.cookie('user_id', user.id);
   req.session.user_id = user.id
   res.redirect("/urls");
 
