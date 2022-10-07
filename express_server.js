@@ -4,10 +4,12 @@
 const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require('cookie-parser');
-const app = express();
-const PORT = 8080; // default port 8080
+const bcrypt = require('bcryptjs')
 
-app.set("view engine", "ejs");
+const PORT = 8080; // default port 8080
+const app = express();
+
+
 
 const urlDatabase = {
   'b2xVn2': {
@@ -21,13 +23,13 @@ const urlDatabase = {
 };
 
 const users = {
-
+  
   'abcd': {
     id: 'abcd',
     email: 'jim@mail.com',
     password: '1234'
   },
-
+  
   'efgh': {
     id: 'efgh',
     email: 'susan@mail.com',
@@ -40,7 +42,7 @@ const users = {
 const getUserByEmail = (email) => {
   for (const id in users) {
     const user = users[id];
-
+    
     if (user.email === email) {
       // we found our user!!
       return user;
@@ -54,7 +56,7 @@ const getUserByEmail = (email) => {
 
 
 function generateRandomString() {
-
+  
   let random = (Math.random().toString(36).slice(6, 12));
 
   return random;
@@ -65,6 +67,7 @@ function generateUniqueId() {
 };
 
 
+app.set("view engine", "ejs");
 
 
 app.use(express.urlencoded({ extended: true }));
@@ -358,11 +361,25 @@ app.post("/login", (req, res) => {
   if (!dbUser) {
     return res.status(403).send('user not found');
   }
-  //incorrect password error check
-  if (dbUser && dbUser.password !== password) {
-    return res.status(403).send('Incorrect password');
-  }
+ 
+ 
+ 
+ 
+ 
+ const result = bcrypt.compareSync(password, dbUser.password);
+ 
+ if (!result) {
 
+ return res.status(400).send('wrong password')  
+}
+   
+ 
+ 
+  // //incorrect password error check
+  // if (dbUser && dbUser.password !== password) {
+  //   return res.status(403).send('Incorrect password');
+  // }
+console.log(users)
   res.cookie('user_id', dbUser.id);
   res.redirect("/urls");
 });
@@ -410,10 +427,14 @@ app.post("/register", (req, res) => {
   //creates a new user object
   const id = generateUniqueId();
 
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(password, salt);
+
+
   const user = {
     id,
     email,
-    password
+    password: hash
   };
 
   //updates the user database with the new user
