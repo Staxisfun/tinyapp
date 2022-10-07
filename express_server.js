@@ -39,9 +39,9 @@ const users = {
 };
 
 
-const getUserByEmail = (email) => {
-  for (const id in users) {
-    const user = users[id];
+const getUserByEmail = (email, database) => {
+  for (const id in database) {
+    const user = database[id];
     
     if (user.email === email) {
       // we found our user!!
@@ -367,7 +367,7 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  const dbUser = getUserByEmail(email);
+  const dbUser = getUserByEmail(email, users);
   // User not found error check
   if (!dbUser) {
     return res.status(403).send('user not found');
@@ -419,7 +419,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send('please enter an email and a password');
   }
   //checks if the email is already being used
-  const dbUser = getUserByEmail(email);
+  const dbUser = getUserByEmail(email, users);
 
   if (dbUser) {
     return res.status(400).send('email is already in use');
