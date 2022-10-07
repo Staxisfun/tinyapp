@@ -41,9 +41,7 @@ const users = {
 
 
 function generateRandomString() {
-  
   let random = (Math.random().toString(36).slice(6, 12));
-
   return random;
 }
 
@@ -72,32 +70,14 @@ keys: ['dfsdf3dsfsd34']
 
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const id = req.session.user_id;
+  const user = users[id];
+
+if (!user) {
+ return res.redirect("/login")
+}
+  return res.redirect("/urls")
 });
-
-
-
-
-
-
-
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-
-
-
-
-
-
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
-
 
 
 
