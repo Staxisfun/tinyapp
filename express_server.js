@@ -5,7 +5,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cookieSession = require('cookie-session')
 const bcrypt = require('bcryptjs')
-
+const { getUserByEmail } = require("./helper")
 const PORT = 8080; // default port 8080
 const app = express();
 
@@ -37,21 +37,6 @@ const users = {
   }
 
 };
-
-
-const getUserByEmail = (email, database) => {
-  for (const id in database) {
-    const user = database[id];
-    
-    if (user.email === email) {
-      // we found our user!!
-      return user;
-    }
-  }
- 
-  return null;
-};
-
 
 
 
